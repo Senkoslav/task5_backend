@@ -11,8 +11,14 @@ const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/$/, ""),
+    origin: [
+      "http://localhost:3000",
+      "https://task5-frontend-opal.vercel.app",
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
