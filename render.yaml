@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: task5-backend
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm ci && npm run db:generate && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: task5-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+databases:
+  - name: task5-db
+    databaseName: task5_db
+    user: postgres
+    plan: free
+    region: oregon
