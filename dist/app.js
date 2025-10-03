@@ -6,9 +6,16 @@ import userRoutes from "./routes/users.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://task5-frontend-opal.vercel.app",
+    process.env.FRONTEND_URL
+].filter((origin) => Boolean(origin));
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: allowedOrigins,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

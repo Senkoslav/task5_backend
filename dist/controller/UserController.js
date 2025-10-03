@@ -39,7 +39,7 @@ export class UserController {
             }
             const user = await UserService.loginUser(email, password);
             if (!user) {
-                return res.status(401).json({
+                return res.status(400).json({
                     success: false,
                     error: "Invalid email or password"
                 });
@@ -93,9 +93,15 @@ export class UserController {
                 });
             }
             const count = await UserService.blockUsers(userIds);
+            if (count === 0) {
+                return res.status(400).json({
+                    success: false,
+                    error: "No users were blocked. They may already be blocked."
+                });
+            }
             return res.json({
                 success: true,
-                message: `${count} users blocked successfully`,
+                message: `${count} user(s) blocked successfully`,
                 count
             });
         }
@@ -113,9 +119,15 @@ export class UserController {
                 });
             }
             const count = await UserService.unblockUsers(userIds);
+            if (count === 0) {
+                return res.status(400).json({
+                    success: false,
+                    error: "No users were unblocked. They may not be blocked."
+                });
+            }
             return res.json({
                 success: true,
-                message: `${count} users unblocked successfully`,
+                message: `${count} user(s) unblocked successfully`,
                 count
             });
         }

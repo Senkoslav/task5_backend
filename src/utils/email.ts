@@ -23,6 +23,10 @@ class EmailService {
             return;
         }
 
+        console.log(`Attempting to send email to: ${email}`);
+        console.log(`Using SMTP: ${process.env.EMAIL_HOST}:${process.env.EMAIL_PORT}`);
+        console.log(`From: ${process.env.EMAIL_FROM}`);
+
         const verificationLink = `${process.env.FRONTEND_URL}/verify/${userId}`;
 
         const mailOptions = {
@@ -40,10 +44,13 @@ class EmailService {
         };
 
         try {
-            await this.transporter.sendMail(mailOptions);
-            console.log(`Verification email sent to ${email}`);
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log(`✅ Email sent successfully to ${email}`);
+            console.log(`Message ID: ${info.messageId}`);
+            console.log(`Response: ${info.response}`);
         } catch (error) {
-            console.warn(`Failed to send verification email to ${email}. User can still login.`);
+            console.error(`❌ Failed to send email to ${email}:`, error);
+            console.warn(`User can still login without email verification.`);
         }
     }
 }
