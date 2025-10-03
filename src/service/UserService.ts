@@ -138,4 +138,12 @@ export class UserService {
 
         return result.count;
     }
+
+    static async deleteUnverifiedUsers(): Promise<number> {
+        const result = await prisma.user.deleteMany({
+            where: { status: UserStatus.UNVERIFIED },
+        });
+
+        return result.count;
+    }
 }

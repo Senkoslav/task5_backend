@@ -17,7 +17,7 @@ class EmailService {
 
     async sendVerificationEmail(email: string, userId: number): Promise<void> {
         const verificationLink = `${process.env.FRONTEND_URL}/verify/${userId}`;
-        
+
         const mailOptions = {
             from: process.env.EMAIL_FROM,
             to: email,

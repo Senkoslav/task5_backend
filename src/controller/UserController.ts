@@ -177,4 +177,18 @@ export class UserController {
       return res.status(400).json({ success: false, error: err.message });
     }
   }
+
+  static async deleteUnverifiedUsers(req: Request, res: Response) {
+    try {
+      const count = await UserService.deleteUnverifiedUsers();
+
+      return res.json({ 
+        success: true, 
+        message: `${count} unverified users deleted successfully`,
+        count 
+      });
+    } catch (err: any) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+  }
 }
