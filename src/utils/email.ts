@@ -12,10 +12,17 @@ class EmailService {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
+            connectionTimeout: 5000,
+            greetingTimeout: 5000,
         });
     }
 
     async sendVerificationEmail(email: string, userId: number): Promise<void> {
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.warn('Email credentials not configured. Skipping email send.');
+            return;
+        }
+
         const verificationLink = `${process.env.FRONTEND_URL}/verify/${userId}`;
 
         const mailOptions = {
@@ -36,7 +43,7 @@ class EmailService {
             await this.transporter.sendMail(mailOptions);
             console.log(`Verification email sent to ${email}`);
         } catch (error) {
-            console.error('Failed to send verification email:', error);
+            console.warn(`Failed to send verification email to ${email}. User can still login.`);
         }
     }
 }
