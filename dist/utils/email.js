@@ -4,14 +4,26 @@ class EmailService {
         this.transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST || 'smtp.gmail.com',
             port: parseInt(process.env.EMAIL_PORT || '587'),
-            secure: false,
+            secure: process.env.EMAIL_PORT === '465',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-            connectionTimeout: 5000,
-            greetingTimeout: 5000,
+            connectionTimeout: 60000,
+            greetingTimeout: 30000,
+            socketTimeout: 60000,
         });
+    }
+    async testConnection() {
+        try {
+            await this.transporter.verify();
+            console.log('SMTP connection verified successfully');
+            return true;
+        }
+        catch (error) {
+            console.error('SMTP connection failed:', error);
+            return false;
+        }
     }
     async sendVerificationEmail(email, userId) {
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -21,6 +33,14 @@ class EmailService {
         console.log(`Attempting to send email to: ${email}`);
         console.log(`Using SMTP: ${process.env.EMAIL_HOST}:${process.env.EMAIL_PORT}`);
         console.log(`From: ${process.env.EMAIL_FROM}`);
+        console.log(`Secure: ${process.env.EMAIL_PORT === '465'}`);
+        // Проверяем соединение перед отправкой
+        const isConnected = await this.testConnection();
+        if (!isConnected) {
+            console.error('Cannot establish SMTP connection. Email will not be sent.');
+            console.warn('Suggestion: Try using Mailtrap or SendGrid instead of Gmail on hosting platforms.');
+            return;
+        }
         const verificationLink = `${process.env.FRONTEND_URL}/verify/${userId}`;
         const mailOptions = {
             from: process.env.EMAIL_FROM,
@@ -44,6 +64,10 @@ class EmailService {
         catch (error) {
             console.error(`Failed to send email to ${email}:`, error);
             console.warn(`User can still login without email verification.`);
+            if (error instanceof Error && 'code' in error && error.code === 'ETIMEDOUT') {
+                console.error('Connection timeout - hosting provider may be blocking SMTP connections');
+                console.log('Try using SendGrid, Mailtrap, or another email service');
+            }
         }
     }
 }

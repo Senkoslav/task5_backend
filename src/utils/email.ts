@@ -7,14 +7,14 @@ class EmailService {
         this.transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST || 'smtp.gmail.com',
             port: parseInt(process.env.EMAIL_PORT || '587'),
-            secure: process.env.EMAIL_PORT === '465', 
+            secure: process.env.EMAIL_PORT === '465',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-            connectionTimeout: 60000, 
-            greetingTimeout: 30000,  
-            socketTimeout: 60000,     
+            connectionTimeout: 60000,
+            greetingTimeout: 30000,
+            socketTimeout: 60000,
         });
     }
 
@@ -72,8 +72,8 @@ class EmailService {
         } catch (error) {
             console.error(`Failed to send email to ${email}:`, error);
             console.warn(`User can still login without email verification.`);
-            
-            if (error.code === 'ETIMEDOUT') {
+
+            if (error instanceof Error && 'code' in error && error.code === 'ETIMEDOUT') {
                 console.error('Connection timeout - hosting provider may be blocking SMTP connections');
                 console.log('Try using SendGrid, Mailtrap, or another email service');
             }
