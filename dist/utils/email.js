@@ -37,12 +37,12 @@ class EmailService {
         };
         try {
             const info = await this.transporter.sendMail(mailOptions);
-            console.log(`✅ Email sent successfully to ${email}`);
+            console.log(`Email sent successfully to ${email}`);
             console.log(`Message ID: ${info.messageId}`);
             console.log(`Response: ${info.response}`);
         }
         catch (error) {
-            console.error(`❌ Failed to send email to ${email}:`, error);
+            console.error(`Failed to send email to ${email}:`, error);
             console.warn(`User can still login without email verification.`);
         }
     }
